@@ -44,7 +44,9 @@ begin
 end;
 $$;
 
-create trigger trg_check_credit_limit
+drop trigger if exists trg_check_credit on orders;
+
+create trigger trg_check_credit
 before insert on orders
 for each row
 execute function check_credit_limit();
