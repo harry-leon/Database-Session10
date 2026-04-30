@@ -1,15 +1,12 @@
-drop table if exists employees_log;
-drop table if exists employees;
-
 create table employees (
-    id bigint generated always as identity primary key,
+    id serial generated primary key,
     name text not null,
     position text not null,
     salary numeric(12, 2) not null check (salary >= 0)
 );
 
 create table employees_log (
-    employee_id bigint not null,
+    employee_id serial not null,
     operation text not null,
     old_data jsonb,
     new_data jsonb,
@@ -38,8 +35,6 @@ begin
     return old;
 end;
 $$;
-
-drop trigger if exists trg_employees_log on employees;
 
 create trigger trg_employees_log
 after insert or update or delete on employees
