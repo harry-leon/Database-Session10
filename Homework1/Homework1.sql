@@ -1,43 +1,43 @@
-DROP TABLE IF EXISTS products;
+drop table if exists products;
 
-CREATE TABLE products (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name TEXT NOT NULL,
-    price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
-    last_modified TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+create table products (
+    id bigint generated always as identity primary key,
+    name text not null,
+    price numeric(12, 2) not null check (price >= 0),
+    last_modified timestamptz not null default current_timestamp
 );
 
-CREATE OR REPLACE FUNCTION update_last_modified()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    NEW.last_modified := CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
+create or replace function update_last_modified()
+returns trigger
+language plpgsql
+as $$
+begin
+    new.last_modified := current_timestamp;
+    return new;
+end;
 $$;
 
-DROP TRIGGER IF EXISTS trg_update_last_modified ON products;
+drop trigger if exists trg_update_last_modified on products;
 
-CREATE TRIGGER trg_update_last_modified
-BEFORE UPDATE ON products
-FOR EACH ROW
-EXECUTE FUNCTION update_last_modified();
+create trigger trg_update_last_modified
+before update on products
+for each row
+execute function update_last_modified();
 
-INSERT INTO products (name, price)
-VALUES
-    ('Laptop', 1500.00),
-    ('Mouse', 25.50),
-    ('Keyboard', 45.00);
+insert into products (name, price)
+values
+    ('laptop', 1500.00),
+    ('mouse', 25.50),
+    ('keyboard', 45.00);
 
-SELECT id, name, price, last_modified
-FROM products
-ORDER BY id;
+select id, name, price, last_modified
+from products
+order by id;
 
-UPDATE products
-SET price = price + 10.00
-WHERE name IN ('Mouse', 'Keyboard');
+update products
+set price = price + 10.00
+where name in ('mouse', 'keyboard');
 
-SELECT id, name, price, last_modified
-FROM products
-ORDER BY id;
+select id, name, price, last_modified
+from products
+order by id;
