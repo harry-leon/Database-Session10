@@ -1,7 +1,5 @@
-drop table if exists products;
-
 create table products (
-    id bigint generated always as identity primary key,
+    id serial primary key,
     name text not null,
     price numeric(12, 2) not null check (price >= 0),
     last_modified timestamptz not null default current_timestamp
@@ -16,8 +14,6 @@ begin
     return new;
 end;
 $$;
-
-drop trigger if exists trg_update_last_modified on products;
 
 create trigger trg_update_last_modified
 before update on products
@@ -37,7 +33,3 @@ order by id;
 update products
 set price = price + 10.00
 where name in ('mouse', 'keyboard');
-
-select id, name, price, last_modified
-from products
-order by id;
