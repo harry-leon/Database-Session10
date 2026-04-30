@@ -1,16 +1,14 @@
-drop table if exists orders;
-drop table if exists customers;
-
-create table customers (
-    id bigint generated always as identity primary key,
-    name text not null,
-    credit_limit numeric(12, 2) not null check (credit_limit >= 0)
+Create table customers (
+    id serrial primary key,
+    name varchar(255) not null,
+    credit_limit numeric(10, 2) not null
 );
 
-create table orders (
-    id bigint generated always as identity primary key,
-    customer_id bigint not null references customers(id),
-    order_amount numeric(12, 2) not null check (order_amount >= 0)
+Create table orders (
+    id serial primary key,
+    customer_id int not null,
+    order_amount numeric(10, 2) not null,
+    constraint fk_customer_id foreign key (id) references customers(id)
 );
 
 create or replace function check_credit_limit()
@@ -44,34 +42,24 @@ begin
 end;
 $$;
 
-drop trigger if exists trg_check_credit on orders;
-
-create trigger trg_check_credit
+create trigger trg_check_credit_limit
 before insert on orders
 for each row
 execute function check_credit_limit();
 
-insert into customers (name, credit_limit)
-values
-    ('an', 100.00),
-    ('binh', 200.00);
+insert into customers (name, credit_limit) values
+('an', 100.00),
+('binh', 200.00);
 
 insert into orders (customer_id, order_amount)
-values
-    (1, 60.00);
+values (1, 60.00);
 
 insert into orders (customer_id, order_amount)
-values
-    (1, 30.00);
+values (1, 30.00);
 
 do $$
-begin
-    insert into orders (customer_id, order_amount)
-    values
-        (1, 20.00);
-exception
-    when others then
-        raise notice '%', sqlerrm;
+begin insert into orders (customer_id, order_amount) values (1, 20.00);
+exception when others then raise notice '%', sqlerrm;
 end;
 $$;
 
